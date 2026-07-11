@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Resi SPX Barranetmedia</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{
+    --ink:#1c2128;
+    --paper:#faf7f4;
+    --line:#e8e0d8;
+    --accent:#ee4d2d;
+    --accent-dark:#c9401f;
+    --accent-soft:#fff0e6;
+    --green:#16a34a;
+    --green-soft:#e9f7ee;
+    --green-text:#15803d;
+    --yellow:#f0a500;
+    --yellow-soft:#fff5da;
+    --yellow-text:#a15c00;
+    --red:#dc2626;
+    --red-soft:#fdeceb;
+    --red-text:#b91c1c;
+    --wa:#25D366;
+    --mono:'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding:32px 16px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:24px;}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{font-size:24px;margin:0 0 4px;font-weight:500;}
+  p.sub{color:#7a7268;margin:0;font-size:14px;}
+
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+  }
+  label{font-size:13px;font-weight:600;display:block;margin-bottom:8px;}
+  textarea{
+    width:100%;
+    min-height:90px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+    font-family:var(--mono);
+    font-size:13px;
+    resize:vertical;
+    background:#fdfbf8;
+  }
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .hint{font-size:12px;color:#a39a8d;margin-top:6px;}
+
+  .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  button{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  button:hover{background:var(--accent-dark);}
+  button:disabled{background:#d8cfc4;cursor:not-allowed;}
+  button.ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  button.ghost:hover{background:#f3ede5;}
+
+  .status-line{font-size:13px;color:#7a7268;}
+
+  .summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    font-family:var(--mono);
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .chip.found{color:var(--accent);border-color:var(--accent);}
+  .chip.missing{color:var(--red-text);border-color:var(--red);}
+
+  .missing-list{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--red-text);
+    background:var(--red-soft);
+    border-radius:8px;
+    padding:10px 14px;
+    margin-bottom:16px;
+  }
+
+  .cards{display:flex;flex-direction:column;gap:12px;}
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:3px solid var(--accent);
+    border-radius:12px;
+    padding:16px 20px;
+  }
+  .card.status-delivered{border-left-color:var(--green);}
+  .card.status-ongoing{border-left-color:var(--yellow);}
+  .card.status-retur{border-left-color:var(--red);}
+
+  .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .resi-code{font-family:var(--mono);font-weight:600;font-size:14px;}
+  .status-badge{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    padding:4px 12px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .status-delivered .status-badge{background:var(--green-soft);color:var(--green-text);}
+  .status-ongoing .status-badge{background:var(--yellow-soft);color:var(--yellow-text);}
+  .status-retur .status-badge{background:var(--red-soft);color:var(--red-text);}
+  .status-other .status-badge{background:#eee;color:#666;}
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 16px;
+    font-size:13px;
+    color:#4a453e;
+  }
+  .card-grid .full{grid-column:1/-1;}
+  .card-grid .label{color:#a39a8d;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;display:block;margin-bottom:2px;}
+
+  .card-actions{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid #f0e9e0;
+  }
+  .btn-action{
+    flex:1;
+    text-align:center;
+    font-size:13px;
+    font-weight:600;
+    padding:9px 0;
+    border-radius:8px;
+    text-decoration:none;
+  }
+  .btn-resi{border:1px solid var(--line);color:var(--ink);background:#fff;}
+  .btn-resi:hover{background:#f3ede5;}
+  .btn-wa{background:var(--wa);color:#fff;}
+  .btn-wa:hover{background:#1ea952;}
+
+  .empty{text-align:center;padding:40px 20px;color:#a39a8d;font-size:14px;}
+
+  .setup-note{
+    font-size:12px;
+    color:#a39a8d;
+    background:#fff;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin-top:20px;
+  }
+  code{background:#f3ede5;padding:1px 5px;border-radius:4px;font-family:var(--mono);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Rahasia perusahaan</div>
+    <h1>Cek Resi SPX Barranetmedia</h1>
+    <p class="sub">Selamat berjuang, sukses....</p>
+  </header>
+
+  <div class="panel" id="loginPanel">
+    <label>Login dengan akun Google yang sudah diizinkan</label>
+    <div id="googleSignInBtn" style="margin-top:8px;"></div>
+    <div class="status-line" id="loginStatus" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="panel" id="searchPanel" style="display:none;">
+    <label for="queryInput">Cari berdasarkan resi, nama, atau no HP</label>
+    <textarea id="queryInput" placeholder="hariyanto&#10;81327700275&#10;SPXID06358221"></textarea>
+    <div class="hint">Bisa cari banyak sekaligus, satu per baris atau dipisah koma. Boleh dicampur (resi + nama + HP).</div>
+    <div class="row">
+      <button id="searchBtn">Cari resi</button>
+      <button class="ghost" id="clearBtn">Bersihkan</button>
+      <span class="status-line" id="statusLine"></span>
+    </div>
+  </div>
+
+  <div id="resultsArea"></div>
+
+  <div class="setup-note" id="setupNote">
+    ⚙️ Belum terhubung ke Google Sheet. Buka <code>index.html</code>, cari baris <code>const API_URL</code> dan <code>const GOOGLE_CLIENT_ID</code>, lalu isi keduanya.
+  </div>
+</div>
+
+<script>
+  // GANTI dengan URL Web App hasil deploy Apps Script kamu
+  var API_URL = "https://script.google.com/macros/s/AKfycbyZo8dEMfDcS84-WDwZiZeZS-WzdAwLOAyr_lU1TAovOZdW7PV0Qh338mhNJRDOKua1oA/exec";
+  // GANTI dengan Client ID dari Google Cloud Console (harus SAMA dengan yang di Code.gs)
+  var GOOGLE_CLIENT_ID = "315770296664-pkethfkpdhd9bqj1lnjj0ec06eos8rlv.apps.googleusercontent.com";
+
+  var ID_TOKEN = null;
+
+  var queryInput = document.getElementById('queryInput');
+  var searchBtn = document.getElementById('searchBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var statusLine = document.getElementById('statusLine');
+  var resultsArea = document.getElementById('resultsArea');
+  var setupNote = document.getElementById('setupNote');
+  var loginPanel = document.getElementById('loginPanel');
+  var searchPanel = document.getElementById('searchPanel');
+  var loginStatus = document.getElementById('loginStatus');
+
+  if (API_URL && API_URL !== "PASTE_URL_WEB_APP_DISINI") {
+    setupNote.style.display = 'none';
+  }
+
+  window.onload = function () {
+    if (typeof google === 'undefined') return;
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleSignIn
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleSignInBtn'),
+      { theme: 'outline', size: 'large', text: 'signin_with' }
+    );
+  };
+
+  function handleGoogleSignIn(response) {
+    ID_TOKEN = response.credential;
+    loginStatus.textContent = 'Memeriksa akses...';
+
+    fetch(API_URL + '?token=' + encodeURIComponent(ID_TOKEN) + '&q=__cek_akses__')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.success) {
+          loginStatus.textContent = data.error;
+          ID_TOKEN = null;
+          return;
+        }
+        loginPanel.style.display = 'none';
+        searchPanel.style.display = '';
+      })
+      .catch(function (err) {
+        loginStatus.textContent = 'Gagal terhubung: ' + err.message;
+      });
+  }
+
+  clearBtn.addEventListener('click', function () {
+    queryInput.value = '';
+    resultsArea.innerHTML = '';
+    statusLine.textContent = '';
+  });
+
+  searchBtn.addEventListener('click', searchResi);
+  queryInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.ctrlKey) searchResi();
+  });
+
+  function statusClass(status) {
+    var s = (status || '').toLowerCase();
+    if (s.indexOf('deliver') !== -1) return 'status-delivered';
+    if (s.indexOf('ongoing') !== -1 || s.indexOf('on going') !== -1 || s.indexOf('proses') !== -1) return 'status-ongoing';
+    if (s.indexOf('retur') !== -1) return 'status-retur';
+    return 'status-other';
+  }
+
+  function buildWaMessage(item) {
+    return "Halo Kak " + item.nama + " \uD83D\uDC4B\n\n" +
+      "\uD83D\uDCE6 Nomor Resi Pesanan " + item.produk + ":\n" +
+      item.resi + "\n\n" +
+      "Mohon pastikan nomor resi pada paket sama dengan nomor di atas saat paket diterima.\n\n" +
+      "Cek posisi paket di sini:\n" +
+      item.linkResi + "\n\n" +
+      "Terima kasih \uD83D\uDE4F";
+  }
+
+  function waLink(item) {
+    var phone = String(item.noHp).replace(/\D/g, '');
+    var normalized;
+    if (phone.charAt(0) === '0') {
+      normalized = '62' + phone.slice(1);
+    } else if (phone.indexOf('62') === 0) {
+      normalized = phone;
+    } else {
+      normalized = '62' + phone;
+    }
+    var msg = encodeURIComponent(buildWaMessage(item));
+    return 'https://wa.me/' + normalized + '?text=' + msg;
+  }
+
+  function searchResi() {
+    var raw = queryInput.value.trim();
+    if (!raw) {
+      statusLine.textContent = 'Masukkan minimal satu kata kunci.';
+      return;
+    }
+    if (!API_URL || API_URL === "PASTE_URL_WEB_APP_DISINI") {
+      statusLine.textContent = 'API belum disambungkan.';
+      return;
+    }
+
+    searchBtn.disabled = true;
+    statusLine.textContent = 'Mencari...';
+    resultsArea.innerHTML = '';
+
+    fetch(API_URL + '?token=' + encodeURIComponent(ID_TOKEN) + '&q=' + encodeURIComponent(raw))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        searchBtn.disabled = false;
+        if (!data.success) {
+          statusLine.textContent = 'Terjadi kesalahan: ' + data.error;
+          return;
+        }
+        statusLine.textContent = 'Ditemukan ' + data.total + ' hasil.';
+        renderResults(data);
+      })
+      .catch(function (err) {
+        searchBtn.disabled = false;
+        statusLine.textContent = 'Gagal terhubung ke server: ' + err.message;
+      });
+  }
+
+  function renderResults(data) {
+    var html = '';
+
+    html += '<div class="summary">' +
+      '<div class="chip found">&#10003; Ditemukan: ' + data.total + '</div>' +
+      (data.notFound.length > 0 ? '<div class="chip missing">&#10007; Tidak ditemukan: ' + data.notFound.length + '</div>' : '') +
+      '</div>';
+
+    if (data.notFound.length > 0) {
+      html += '<div class="missing-list">Tidak ditemukan: ' + data.notFound.map(escapeHtml).join(', ') + '</div>';
+    }
+
+    if (data.data.length === 0) {
+      html += '<div class="empty">Tidak ada data yang cocok.</div>';
+    } else {
+      html += '<div class="cards">';
+      data.data.forEach(function (item) {
+        var cls = statusClass(item.status);
+        html += '<div class="card ' + cls + '">' +
+          '<div class="card-head">' +
+            '<span class="resi-code">' + escapeHtml(item.resi) + '</span>' +
+            '<span class="status-badge">' + escapeHtml(item.status) + '</span>' +
+          '</div>' +
+          '<div class="card-grid">' +
+            '<div><span class="label">Nama</span>' + escapeHtml(item.nama) + '</div>' +
+            '<div><span class="label">No HP</span>' + escapeHtml(item.noHp) + '</div>' +
+            '<div class="full"><span class="label">Alamat</span>' + escapeHtml(item.alamat) + '</div>' +
+            '<div><span class="label">Produk</span>' + escapeHtml(item.produk) + '</div>' +
+            '<div><span class="label">Harga</span>Rp' + Number(item.harga || 0).toLocaleString('id-ID') + '</div>' +
+            '<div class="full"><span class="label">Tanggal order</span>' + escapeHtml(item.tanggal) + '</div>' +
+          '</div>' +
+          '<div class="card-actions">' +
+            (item.linkResi ? '<a class="btn-action btn-resi" href="' + item.linkResi + '" target="_blank">Lihat resi</a>' : '') +
+            (item.noHp ? '<a class="btn-action btn-wa" href="' + waLink(item) + '" target="_blank">Kirim WhatsApp</a>' : '') +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    resultsArea.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : str;
+    return div.innerHTML;
+  }
+</script>
+</body>
+</html>
