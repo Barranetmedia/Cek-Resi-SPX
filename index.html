@@ -219,7 +219,7 @@
 
 <script>
   // GANTI dengan URL Web App hasil deploy Apps Script kamu
-  var API_URL = "https://script.google.com/macros/s/AKfycbyZo8dEMfDcS84-WDwZiZeZS-WzdAwLOAyr_lU1TAovOZdW7PV0Qh338mhNJRDOKua1oA/exec";
+  var API_URL = "PASTE_URL_WEB_APP_DISINI";
   // GANTI dengan Client ID dari Google Cloud Console (harus SAMA dengan yang di Code.gs)
   var GOOGLE_CLIENT_ID = "315770296664-pkethfkpdhd9bqj1lnjj0ec06eos8rlv.apps.googleusercontent.com";
 
@@ -251,24 +251,43 @@
     );
   };
 
+  function jsonpRequest(params, callback) {
+    var callbackName = 'jsonp_cb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    window[callbackName] = function (data) {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      callback(null, data);
+    };
+    var query = Object.keys(params).map(function (k) {
+      return k + '=' + encodeURIComponent(params[k]);
+    }).join('&');
+    var script = document.createElement('script');
+    script.src = API_URL + '?' + query + '&callback=' + callbackName;
+    script.onerror = function () {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      callback(new Error('Gagal memuat data dari server.'));
+    };
+    document.body.appendChild(script);
+  }
+
   function handleGoogleSignIn(response) {
     ID_TOKEN = response.credential;
     loginStatus.textContent = 'Memeriksa akses...';
 
-    fetch(API_URL + '?token=' + encodeURIComponent(ID_TOKEN) + '&q=__cek_akses__')
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (!data.success) {
-          loginStatus.textContent = data.error;
-          ID_TOKEN = null;
-          return;
-        }
-        loginPanel.style.display = 'none';
-        searchPanel.style.display = '';
-      })
-      .catch(function (err) {
+    jsonpRequest({ token: ID_TOKEN, q: '__cek_akses__' }, function (err, data) {
+      if (err) {
         loginStatus.textContent = 'Gagal terhubung: ' + err.message;
-      });
+        return;
+      }
+      if (!data.success) {
+        loginStatus.textContent = data.error;
+        ID_TOKEN = null;
+        return;
+      }
+      loginPanel.style.display = 'none';
+      searchPanel.style.display = '';
+    });
   }
 
   clearBtn.addEventListener('click', function () {
@@ -329,21 +348,19 @@
     statusLine.textContent = 'Mencari...';
     resultsArea.innerHTML = '';
 
-    fetch(API_URL + '?token=' + encodeURIComponent(ID_TOKEN) + '&q=' + encodeURIComponent(raw))
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        searchBtn.disabled = false;
-        if (!data.success) {
-          statusLine.textContent = 'Terjadi kesalahan: ' + data.error;
-          return;
-        }
-        statusLine.textContent = 'Ditemukan ' + data.total + ' hasil.';
-        renderResults(data);
-      })
-      .catch(function (err) {
-        searchBtn.disabled = false;
+    jsonpRequest({ token: ID_TOKEN, q: raw }, function (err, data) {
+      searchBtn.disabled = false;
+      if (err) {
         statusLine.textContent = 'Gagal terhubung ke server: ' + err.message;
-      });
+        return;
+      }
+      if (!data.success) {
+        statusLine.textContent = 'Terjadi kesalahan: ' + data.error;
+        return;
+      }
+      statusLine.textContent = 'Ditemukan ' + data.total + ' hasil.';
+      renderResults(data);
+    });
   }
 
   function renderResults(data) {
