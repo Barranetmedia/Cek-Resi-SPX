@@ -243,12 +243,14 @@
     if (typeof google === 'undefined') return;
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleSignIn
+      callback: handleGoogleSignIn,
+      auto_select: true // otomatis login pakai akun terakhir tanpa perlu klik, kalau masih ada sesi Google aktif
     });
     google.accounts.id.renderButton(
       document.getElementById('googleSignInBtn'),
       { theme: 'outline', size: 'large', text: 'signin_with' }
     );
+    google.accounts.id.prompt(); // coba login otomatis di background
   };
 
   function jsonpRequest(params, callback) {
