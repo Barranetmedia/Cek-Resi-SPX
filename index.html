@@ -131,25 +131,25 @@
     margin-bottom:16px;
   }
 
-  .cards{display:flex;flex-direction:column;gap:12px;}
+  .cards{display:flex;flex-direction:column;gap:8px;}
   .card{
     background:#fff;
     border:1px solid var(--line);
     border-left:3px solid var(--accent);
     border-radius:12px;
-    padding:16px 20px;
+    padding:12px 14px;
   }
   .card.status-delivered{border-left-color:var(--green);}
   .card.status-ongoing{border-left-color:var(--yellow);}
   .card.status-retur{border-left-color:var(--red);}
 
-  .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .card-head{display:flex;justify-content:space-between;align-items:center;}
   .resi-code{font-family:var(--mono);font-weight:600;font-size:14px;}
   .status-badge{
-    font-size:11px;
+    font-size:10px;
     font-weight:700;
     text-transform:uppercase;
-    padding:4px 12px;
+    padding:3px 9px;
     border-radius:999px;
     white-space:nowrap;
   }
@@ -158,47 +158,59 @@
   .status-retur .status-badge{background:var(--red-soft);color:var(--red-text);}
   .status-other .status-badge{background:#eee;color:#666;}
 
-  .card-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px 16px;
-    font-size:13px;
-    color:#4a453e;
+  .card-subhead{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+  .card-date{font-size:10.5px;color:#a39a8d;}
+  .card-price{font-size:12px;font-weight:600;}
+
+  .card-namehp{font-size:12px;margin-top:9px;color:#4a453e;}
+  .card-namehp .sep{color:#a39a8d;}
+
+  .card-line{
+    font-size:11px;
+    color:#7a7268;
+    margin-top:3px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
-  .card-grid .full{grid-column:1/-1;}
-  .card-grid .label{color:#a39a8d;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;display:block;margin-bottom:2px;}
-  .card-grid .truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card-line.open{white-space:normal;overflow:visible;line-height:1.4;}
 
   .card-actions{
     display:flex;
-    gap:8px;
-    margin-top:14px;
-    padding-top:12px;
-    border-top:1px solid #f0e9e0;
+    gap:6px;
+    margin-top:10px;
   }
   .btn-action{
     flex:1;
     text-align:center;
-    font-size:13px;
+    font-size:11px;
     font-weight:600;
-    padding:9px 0;
+    padding:7px 0;
     border-radius:8px;
     text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
   }
   .btn-resi{border:1px solid var(--line);color:var(--ink);background:#fff;}
   .btn-resi:hover{background:#f3ede5;}
   .btn-wa{background:var(--wa);color:#fff;}
   .btn-wa:hover{background:#1ea952;}
   .btn-toggle{
-    flex:0 0 44px;
+    flex:0 0 32px;
     border:1px solid var(--line);
     background:#fff;
     color:var(--ink);
     border-radius:8px;
     cursor:pointer;
-    font-size:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
   .btn-toggle:hover{background:#f3ede5;}
+  .btn-toggle svg{width:13px;height:13px;transition:transform .15s ease;}
+  .btn-toggle.open svg{transform:rotate(180deg);}
 
   .empty{text-align:center;padding:40px 20px;color:#a39a8d;font-size:14px;}
 
@@ -421,24 +433,24 @@
       data.data.forEach(function (item) {
         var cls = statusClass(item.status);
         var isOpen = !!expandedCards[item.resi];
-        var truncClass = isOpen ? '' : ' truncate';
+        var lineClass = isOpen ? ' open' : '';
+        var hargaFmt = 'Rp' + Number(item.harga || 0).toLocaleString('id-ID');
         html += '<div class="card ' + cls + '">' +
           '<div class="card-head">' +
             '<span class="resi-code">' + escapeHtml(item.resi) + '</span>' +
             '<span class="status-badge">' + escapeHtml(item.status) + '</span>' +
           '</div>' +
-          '<div class="card-grid">' +
-            '<div><span class="label">Nama</span>' + escapeHtml(item.nama) + '</div>' +
-            '<div><span class="label">No HP</span>' + escapeHtml(item.noHp) + '</div>' +
-            '<div class="full"><span class="label">Alamat</span><span class="' + truncClass.trim() + '">' + escapeHtml(item.alamat) + '</span></div>' +
-            '<div><span class="label">Produk</span><span class="' + truncClass.trim() + '">' + escapeHtml(item.produk) + '</span></div>' +
-            '<div><span class="label">Harga</span>Rp' + Number(item.harga || 0).toLocaleString('id-ID') + '</div>' +
-            '<div class="full"><span class="label">Tanggal order</span>' + escapeHtml(item.tanggal) + '</div>' +
+          '<div class="card-subhead">' +
+            '<span class="card-date">' + escapeHtml(item.tanggal) + '</span>' +
+            '<span class="card-price">' + hargaFmt + '</span>' +
           '</div>' +
+          '<div class="card-namehp">' + escapeHtml(item.nama) + ' <span class="sep">&bull;</span> ' + escapeHtml(item.noHp) + '</div>' +
+          '<div class="card-line' + lineClass + '">' + escapeHtml(item.alamat) + '</div>' +
+          '<div class="card-line' + lineClass + '">' + escapeHtml(item.produk) + '</div>' +
           '<div class="card-actions">' +
             (item.linkResi ? '<a class="btn-action btn-resi" href="' + item.linkResi + '" target="_blank">Lihat resi</a>' : '') +
-            (item.noHp ? '<a class="btn-action btn-wa" href="' + waLink(item) + '" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.13.11-1.82-.12-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.79-4.17-4.94-4.36-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.16-.29.36-.42.48-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.37-.23.62-.14.25.09 1.6.76 1.87.9.28.14.46.21.53.32.07.12.07.68-.17 1.36z"/></svg>Kirim WhatsApp</a>' : '') +
-            '<button class="btn-toggle" onclick="toggleCard(\'' + item.resi.replace(/'/g, "\\'") + '\')" aria-label="' + (isOpen ? 'Tutup' : 'Lihat') + ' detail">' + (isOpen ? '&#9650;' : '&#9660;') + '</button>' +
+            (item.noHp ? '<a class="btn-action btn-wa" href="' + waLink(item) + '" target="_blank"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.13.11-1.82-.12-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.79-4.17-4.94-4.36-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.16-.29.36-.42.48-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.37-.23.62-.14.25.09 1.6.76 1.87.9.28.14.46.21.53.32.07.12.07.68-.17 1.36z"/></svg>WhatsApp</a>' : '') +
+            '<button class="btn-toggle' + (isOpen ? ' open' : '') + '" onclick="toggleCard(\'' + item.resi.replace(/'/g, "\\'") + '\')" aria-label="' + (isOpen ? 'Tutup' : 'Lihat') + ' detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
           '</div>' +
         '</div>';
       });
