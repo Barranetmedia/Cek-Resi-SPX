@@ -9,7 +9,7 @@
 <style>
   :root{
     --ink:#1c2128;
-    --paper:#faf7f4;
+    --paper:#FBF7F2;
     --line:#e8e0d8;
     --accent:#ee4d2d;
     --accent-dark:#c9401f;
@@ -18,11 +18,11 @@
     --green-soft:#e9f7ee;
     --green-text:#15803d;
     --yellow:#f0a500;
-    --yellow-soft:#fff5da;
-    --yellow-text:#a15c00;
+    --yellow-soft:#FAEEDA;
+    --yellow-text:#854F0B;
     --red:#dc2626;
-    --red-soft:#fdeceb;
-    --red-text:#b91c1c;
+    --red-soft:#FCEBEB;
+    --red-text:#791F1F;
     --wa:#25D366;
     --mono:'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   }
@@ -139,15 +139,15 @@
     border-radius:12px;
     padding:12px 14px;
   }
-  .card.status-delivered{border-left-color:var(--green);}
-  .card.status-ongoing{border-left-color:var(--yellow);}
-  .card.status-retur{border-left-color:var(--red);}
+  .card.status-delivered{border-left-color:var(--accent);}
+  .card.status-ongoing{border-left-color:var(--accent);}
+  .card.status-retur{border-left-color:var(--accent);}
 
   .card-head{display:flex;justify-content:space-between;align-items:center;}
-  .resi-code{font-family:var(--mono);font-weight:600;font-size:14px;}
+  .resi-code{font-family:var(--mono);font-weight:700;font-size:14px;}
   .status-badge{
     font-size:10px;
-    font-weight:700;
+    font-weight:800;
     text-transform:uppercase;
     padding:3px 9px;
     border-radius:999px;
@@ -160,7 +160,7 @@
 
   .card-subhead{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
   .card-date{font-size:10.5px;color:#a39a8d;}
-  .card-price{font-size:12px;font-weight:600;}
+  .card-price{font-size:12px;font-weight:700;}
 
   .card-namehp{font-size:12px;margin-top:9px;color:#4a453e;}
   .card-namehp .sep{color:#a39a8d;}
@@ -184,7 +184,7 @@
     flex:1;
     text-align:center;
     font-size:11px;
-    font-weight:600;
+    font-weight:700;
     padding:7px 0;
     border-radius:8px;
     text-decoration:none;
