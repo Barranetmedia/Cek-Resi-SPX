@@ -71,7 +71,6 @@
     .eyebrow{font-size:11px;padding:5px 12px;margin-bottom:9px;}
     h1{font-size:22px;margin-bottom:3px;}
     p.sub{font-size:13px;}
-    .cards{grid-template-columns:1fr 1fr;}
   }
 
   .panel{
@@ -141,12 +140,16 @@
   }
 
   .cards{display:grid;grid-template-columns:1fr;gap:8px;}
+  @media (min-width:820px){
+    .cards{grid-template-columns:1fr 1fr;}
+  }
   .card{
     background:#fff;
     border:1px solid var(--line);
     border-left:3px solid var(--accent);
     border-radius:12px;
     padding:12px 14px;
+    min-width:0;
   }
   .card.status-delivered{border-left-color:var(--green);}
   .card.status-ongoing{border-left-color:#FFC629;}
@@ -358,7 +361,7 @@
   function statusClass(status) {
     var s = (status || '').toLowerCase();
     if (s.indexOf('deliver') !== -1) return 'status-delivered';
-    if (s.indexOf('ongoing') !== -1 || s.indexOf('on going') !== -1 || s.indexOf('proses') !== -1) return 'status-ongoing';
+    if (s.indexOf('ongoing') !== -1 || s.indexOf('on going') !== -1 || s.indexOf('on-going') !== -1 || s.indexOf('proses') !== -1) return 'status-ongoing';
     if (s.indexOf('retur') !== -1) return 'status-retur';
     return 'status-other';
   }
