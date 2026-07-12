@@ -17,9 +17,9 @@
     --green:#16a34a;
     --green-soft:#e9f7ee;
     --green-text:#15803d;
-    --yellow:#f0a500;
-    --yellow-soft:#FAEEDA;
-    --yellow-text:#854F0B;
+    --yellow:#FFC629;
+    --yellow-soft:#FFF6DA;
+    --yellow-text:#8A6300;
     --red:#dc2626;
     --red-soft:#FCEBEB;
     --red-text:#791F1F;
@@ -32,19 +32,19 @@
     background:var(--paper);
     color:var(--ink);
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    padding:32px 16px 80px;
+    padding:0 0 80px;
   }
-  .wrap{max-width:760px;margin:0 auto;}
+  .wrap{max-width:760px;margin:0 auto;padding:16px 16px 0;}
   header{
-    margin-bottom:24px;
-    border-radius:16px;
+    margin:0 0 24px;
+    border-radius:0 0 16px 16px;
     overflow:hidden;
     background:linear-gradient(135deg, var(--accent) 0%, #ff7a45 100%);
     background-image:
       radial-gradient(circle, rgba(255,255,255,0.25) 1.6px, transparent 1.6px),
       linear-gradient(135deg, var(--accent) 0%, #ff7a45 100%);
     background-size:20px 20px, cover;
-    padding:28px 24px;
+    padding:14px 20px;
     text-align:center;
   }
   .eyebrow{
@@ -52,18 +52,27 @@
     align-items:center;
     gap:6px;
     font-family:var(--mono);
-    font-size:11px;
+    font-size:10px;
     letter-spacing:0.08em;
     text-transform:uppercase;
     color:#fff;
     background:rgba(255,255,255,0.2);
     font-weight:600;
-    padding:5px 12px;
+    padding:4px 10px;
     border-radius:999px;
-    margin-bottom:12px;
+    margin-bottom:7px;
   }
-  h1{font-size:24px;margin:0 0 4px;font-weight:700;color:#fff;}
-  p.sub{color:rgba(255,255,255,0.9);margin:0;font-size:14px;}
+  h1{font-size:18px;margin:0 0 2px;font-weight:700;color:#fff;}
+  p.sub{color:rgba(255,255,255,0.9);margin:0;font-size:12.5px;}
+
+  @media (min-width:820px){
+    .wrap{max-width:960px;}
+    header{padding:20px 40px;}
+    .eyebrow{font-size:11px;padding:5px 12px;margin-bottom:9px;}
+    h1{font-size:22px;margin-bottom:3px;}
+    p.sub{font-size:13px;}
+    .cards{grid-template-columns:1fr 1fr;}
+  }
 
   .panel{
     background:#fff;
@@ -131,7 +140,7 @@
     margin-bottom:16px;
   }
 
-  .cards{display:flex;flex-direction:column;gap:8px;}
+  .cards{display:grid;grid-template-columns:1fr;gap:8px;}
   .card{
     background:#fff;
     border:1px solid var(--line);
@@ -139,9 +148,9 @@
     border-radius:12px;
     padding:12px 14px;
   }
-  .card.status-delivered{border-left-color:var(--accent);}
-  .card.status-ongoing{border-left-color:var(--accent);}
-  .card.status-retur{border-left-color:var(--accent);}
+  .card.status-delivered{border-left-color:var(--green);}
+  .card.status-ongoing{border-left-color:#FFC629;}
+  .card.status-retur{border-left-color:var(--red);}
 
   .card-head{display:flex;justify-content:space-between;align-items:center;}
   .resi-code{font-family:var(--mono);font-weight:700;font-size:14px;}
@@ -227,12 +236,12 @@
 </style>
 </head>
 <body>
+<header>
+  <div class="eyebrow">Rahasia perusahaan</div>
+  <h1>Cek Resi SPX Barranetmedia</h1>
+  <p class="sub">Selamat berjuang, sukses....</p>
+</header>
 <div class="wrap">
-  <header>
-    <div class="eyebrow">Rahasia perusahaan</div>
-    <h1>Cek Resi SPX Barranetmedia</h1>
-    <p class="sub">Selamat berjuang, sukses....</p>
-  </header>
 
   <div class="panel" id="loginPanel">
     <label>Login dengan akun Google yang sudah diizinkan</label>
