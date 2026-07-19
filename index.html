@@ -95,6 +95,22 @@
   textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
   .hint{font-size:12px;color:#a39a8d;margin-top:6px;}
 
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .filter-field{flex:1 1 140px;min-width:140px;}
+  .filter-field label{font-size:11.5px;font-weight:600;margin-bottom:4px;}
+  .filter-field input,
+  .filter-field select{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 10px;
+    font-size:13px;
+    background:#fdfbf8;
+    font-family:inherit;
+  }
+  .filter-field input:focus,
+  .filter-field select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
   .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
   button{
     background:var(--accent);
@@ -256,9 +272,36 @@
     <label for="queryInput">Cari berdasarkan resi, nama, atau no HP</label>
     <textarea id="queryInput" placeholder="Widodo&#10;81317081945&#10;SPXID06358221"></textarea>
     <div class="hint">Bisa cari banyak sekaligus, satu per baris atau dipisah koma. Boleh dicampur (resi + nama + HP).</div>
+
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="csInput">CS</label>
+        <input type="text" id="csInput" placeholder="Nama CS (opsional)">
+      </div>
+      <div class="filter-field">
+        <label for="statusInput">Status</label>
+        <select id="statusInput">
+          <option value="">Semua status</option>
+          <option value="ongoing">On going</option>
+          <option value="delivered">Delivered</option>
+          <option value="retur">Retur</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="dateFromInput">Dari tanggal</label>
+        <input type="date" id="dateFromInput">
+      </div>
+      <div class="filter-field">
+        <label for="dateToInput">Sampai tanggal</label>
+        <input type="date" id="dateToInput">
+      </div>
+    </div>
+    <div class="hint">Kolom CS dan tanggal opsional — boleh dipakai sendiri tanpa isi kata kunci di atas, untuk browsing semua resi milik CS/periode tertentu.</div>
+
     <div class="row">
       <button id="searchBtn">Cari resi</button>
       <button class="ghost" id="clearBtn">Bersihkan</button>
+      <button class="ghost" id="todayOngoingBtn" type="button">📦 Semua yang ongoing</button>
       <span class="status-line" id="statusLine"></span>
     </div>
   </div>
@@ -281,6 +324,11 @@
   var lastData = null;
 
   var queryInput = document.getElementById('queryInput');
+  var csInput = document.getElementById('csInput');
+  var statusInput = document.getElementById('statusInput');
+  var dateFromInput = document.getElementById('dateFromInput');
+  var dateToInput = document.getElementById('dateToInput');
+  var todayOngoingBtn = document.getElementById('todayOngoingBtn');
   var searchBtn = document.getElementById('searchBtn');
   var clearBtn = document.getElementById('clearBtn');
   var statusLine = document.getElementById('statusLine');
@@ -349,11 +397,23 @@
 
   clearBtn.addEventListener('click', function () {
     queryInput.value = '';
+    csInput.value = '';
+    statusInput.value = '';
+    dateFromInput.value = '';
+    dateToInput.value = '';
     resultsArea.innerHTML = '';
     statusLine.textContent = '';
   });
 
   searchBtn.addEventListener('click', searchResi);
+  todayOngoingBtn.addEventListener('click', function () {
+    queryInput.value = '';
+    csInput.value = '';
+    statusInput.value = 'ongoing';
+    dateFromInput.value = '';
+    dateToInput.value = '';
+    searchResi();
+  });
   queryInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && e.ctrlKey) searchResi();
   });
@@ -392,8 +452,13 @@
 
   function searchResi() {
     var raw = queryInput.value.trim();
-    if (!raw) {
-      statusLine.textContent = 'Masukkan minimal satu kata kunci.';
+    var cs = csInput.value.trim();
+    var status = statusInput.value;
+    var dateFrom = dateFromInput.value; // yyyy-MM-dd dari <input type="date">
+    var dateTo = dateToInput.value;
+
+    if (!raw && !cs && !status && !dateFrom && !dateTo) {
+      statusLine.textContent = 'Masukkan minimal satu kata kunci, CS, status, atau periode tanggal.';
       return;
     }
     if (!API_URL || API_URL === "PASTE_URL_WEB_APP_DISINI") {
@@ -405,7 +470,7 @@
     statusLine.textContent = 'Mencari...';
     resultsArea.innerHTML = '';
 
-    jsonpRequest({ token: ID_TOKEN, q: raw }, function (err, data) {
+    jsonpRequest({ token: ID_TOKEN, q: raw, cs: cs, status: status, dateFrom: dateFrom, dateTo: dateTo }, function (err, data) {
       searchBtn.disabled = false;
       if (err) {
         statusLine.textContent = 'Gagal terhubung ke server: ' + err.message;
